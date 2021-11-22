@@ -21,9 +21,8 @@ class BoltDataset(Dataset):
         self.df = df
         print(len(self.df))
         self.transform = transform
-
-    def __getitem__(self, index: int):
-        
+    
+    def get_image_and_labels_by_idx(self, index):
         path = self.df.filename[index]
         #print(path)
         bolts = self.df.total_bolts[index]
@@ -32,39 +31,47 @@ class BoltDataset(Dataset):
         img = np.flipud(img)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         bboxes = self.df.bboxes[index]
-        
         labels=['Bolt']*len(bboxes)
-        sample = {
-            "image": img,
-            "bboxes": bboxes,
-            "labels": labels,
-        }
+        #print(bboxes)
+        return img, bboxes, labels, bolts
+
+    def __getitem__(self, index: int):
         
-        sample = self.transform(**sample)
-        sample["bboxes"] = np.array(sample["bboxes"])
-        image = sample["image"]
-        bboxes = sample["bboxes"]
-        labels = sample["labels"]
+        (img, bboxes, labels, bolts) = self.get_image_and_labels_by_idx(index)
+
+#         sample = {
+#             "image": img,
+#             "bboxes": bboxes,
+#             "labels": labels,
+#         }
+#         #print(sample['bboxes'])
         
-        _, new_h, new_w = image.shape
-        sample["bboxes"][:, [0, 1, 2, 3]] = sample["bboxes"][
-            :, [1, 0, 3, 2]
-        ]  # convert to yxyx
+        if self.transform is not None:
+            transformed = self.transform(image=img, bboxes=bboxes, labels=['Bolt']*len(bboxes))
+            transformed_image = transformed['image']
+            transformed_bboxes = transformed['bboxes']
+            transformed_class_labels = transformed['labels']
+        
+#         sample = self.transform(**sample)
+#         sample["bboxes"] = np.array(sample["bboxes"])
+#         image = sample["image"]
+#         bboxes = sample["bboxes"]
+#         labels = sample["labels"]
+        
+        _, new_h, new_w = transformed_image.shape
+        transformed_bboxes = np.array(transformed_bboxes)
+        transformed_bboxes[:, [0, 1, 2, 3]] = transformed_bboxes[:, [1, 0, 3, 2]]  # convert to yxyx
 
         target = {
-            "bboxes": torch.as_tensor(bboxes, dtype=torch.float32),
-            "labels": torch.ones(len(bboxes), dtype=torch.int64),
+            "bboxes": torch.as_tensor(transformed_bboxes, dtype=torch.float32),
+            "labels": torch.ones(len(transformed_bboxes), dtype=torch.int64),
             "img_size": (new_h, new_w),
             "img_scale": torch.tensor([1.0]),
         }
 
-        return image, target, bolts
+        return transformed_image, target, bolts
         
-#         if self.transform is not None:
-#             transformed = self.transform(image=img, bboxes=bboxes, class_labels=['Bolt']*len(bboxes))
-#             transformed_image = transformed['image']
-#             transformed_bboxes = transformed['bboxes']
-#             transformed_class_labels = transformed['class_labels']
+
 
 #         # there is only one class
 #         labels = torch.ones(len(bboxes), dtype=torch.int64)
@@ -76,14 +83,7 @@ class BoltDataset(Dataset):
     
     def show_data(self, index: int):
         """Visualizes a single bounding box on the image"""
-        bboxes = self.df.bboxes[index]
-
-        img = cv2.imread(self.df.filename[index])
-        img = img.transpose(1,0,2)
-        #img = np.fliplr(img)
-        img = np.flipud(img)
-        print(img.shape)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        (img, bboxes, labels, bolts) = self.get_image_and_labels_by_idx(index)
         
         if self.transform is not None:
             transformed = self.transform(image=img, bboxes=bboxes, labels=['Bolt']*len(bboxes))

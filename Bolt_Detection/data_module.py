@@ -5,6 +5,11 @@ def get_train_transforms(target_img_size=2048):
     return A.Compose(
         [
             A.HorizontalFlip(p=0.5),
+            A.VerticalFlip(p=0.5),
+            A.Blur(p=0.3),
+            A.Rotate(limit=15),
+            A.HueSaturationValue(p=0.5),
+            A.RandomBrightnessContrast(p=0.5),
             A.Resize(height=target_img_size, width=target_img_size, p=1),
             A.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
             ToTensorV2(p=1),
@@ -30,7 +35,7 @@ def get_valid_transforms(target_img_size=512):
     )
 
 
-class BoltDataModule(LightningDataModule):
+class BoltDataModule(pl.LightningDataModule):
     
     def __init__(self,
                 df,
@@ -65,7 +70,7 @@ class BoltDataModule(LightningDataModule):
         return train_loader
 
     def val_dataset(self) -> BoltDataset:
-        return BoltDataset(self.df, self.val_tfms , 'valid')
+        return BoltDataset(self.df, self.valid_tfms , 'valid')
 
     def val_dataloader(self) -> DataLoader:
         valid_dataset = self.val_dataset()
@@ -82,7 +87,7 @@ class BoltDataModule(LightningDataModule):
         return valid_loader
     
     def test_dataset(self) -> BoltDataset:
-        return BoltDataset(self.df, self.val_tfms , 'test')
+        return BoltDataset(self.df, self.valid_tfms , 'test')
 
     def test_dataloader(self) -> DataLoader:
         test_dataset = self.test_dataset()

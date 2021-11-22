@@ -45,6 +45,7 @@ from pytorch_lightning.loggers import TensorBoardLogger
 from pytorch_lightning.callbacks import LearningRateMonitor
 from pytorch_lightning.callbacks import ModelCheckpoint
 from objdetecteval.metrics.coco_metrics import get_coco_stats
+from pytorch_lightning import Trainer
 
 
 def unfreeze(model,percent=0.25):
