@@ -1,7 +1,7 @@
 from utils import *
 from dataset import *
 
-def get_train_transforms(target_img_size=2048):
+def get_train_transforms(target_img_size=1024):
     return A.Compose(
         [
             A.HorizontalFlip(p=0.5),
@@ -21,7 +21,7 @@ def get_train_transforms(target_img_size=2048):
     )
 
 
-def get_valid_transforms(target_img_size=512):
+def get_valid_transforms(target_img_size=1024):
     return A.Compose(
         [
             A.Resize(height=target_img_size, width=target_img_size, p=1),
@@ -42,13 +42,13 @@ class BoltDataModule(pl.LightningDataModule):
                 train_transforms=get_train_transforms(target_img_size=1024),
                 valid_transforms=get_valid_transforms(target_img_size=1024),
                 num_workers=16,
-                batch_size=8):
+                bs=2):
         
         self.df = df
         self.train_tfms = train_transforms
         self.valid_tfms = valid_transforms
         self.num_workers = num_workers
-        self.batch_size = batch_size
+        self.bs = bs
         super().__init__()
 
     def train_dataset(self) -> BoltDataset:
@@ -59,7 +59,7 @@ class BoltDataModule(pl.LightningDataModule):
         train_dataset = self.train_dataset()
         train_loader = torch.utils.data.DataLoader(
             train_dataset,
-            batch_size=self.batch_size,
+            batch_size=self.bs,
             shuffle=True,
             pin_memory=True,
             drop_last=True,
@@ -76,7 +76,7 @@ class BoltDataModule(pl.LightningDataModule):
         valid_dataset = self.val_dataset()
         valid_loader = torch.utils.data.DataLoader(
             valid_dataset,
-            batch_size=self.batch_size,
+            batch_size=self.bs,
             shuffle=False,
             pin_memory=True,
             drop_last=True,
@@ -93,7 +93,7 @@ class BoltDataModule(pl.LightningDataModule):
         test_dataset = self.test_dataset()
         test_loader = torch.utils.data.DataLoader(
             test_dataset,
-            batch_size=self.batch_size,
+            batch_size=self.bs,
             shuffle=False,
             pin_memory=True,
             drop_last=True,
@@ -105,20 +105,23 @@ class BoltDataModule(pl.LightningDataModule):
     
     @staticmethod
     def collate_fn(batch):
-        images, targets, bolts = tuple(zip(*batch))
-        images = torch.stack(images)
-        images = images.float()
+        return tuple(zip(*batch))
+    
+#     def collate_fn(batch):
+#         images, targets, bolts = tuple(zip(*batch))
+#         images = torch.stack(images)
+#         images = images.float()
 
-        boxes = [target["bboxes"].float() for target in targets]
-        labels = [target["labels"].float() for target in targets]
-        img_size = torch.tensor([target["img_size"] for target in targets]).float()
-        img_scale = torch.tensor([target["img_scale"] for target in targets]).float()
+#         boxes = [target["bboxes"].float() for target in targets]
+#         labels = [target["labels"].float() for target in targets]
+#         img_size = torch.tensor([target["img_size"] for target in targets]).float()
+#         img_scale = torch.tensor([target["img_scale"] for target in targets]).float()
 
-        annotations = {
-            "bbox": boxes,
-            "cls": labels,
-            "img_size": img_size,
-            "img_scale": img_scale,
-        }
+#         annotations = {
+#             "bbox": boxes,
+#             "cls": labels,
+#             "img_size": img_size,
+#             "img_scale": img_scale,
+#         }
 
-        return images, annotations, targets, bolts
+#         return images, annotations, targets, bolts
