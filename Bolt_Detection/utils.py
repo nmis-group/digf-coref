@@ -33,6 +33,18 @@ from effdet import get_efficientdet_config, EfficientDet, DetBenchTrain
 from effdet.efficientdet import HeadNet
 from effdet.config.model_config import efficientdet_model_param_dict
 import timm
+from pytorch_lightning import LightningDataModule
+from pytorch_lightning.core.decorators import auto_move_data
+from numbers import Number
+from typing import List
+from functools import singledispatch
+from fastcore.dispatch import typedispatch
+from pytorch_lightning.core.decorators import auto_move_data
+from ensemble_boxes import ensemble_boxes_wbf
+from pytorch_lightning.loggers import TensorBoardLogger
+from pytorch_lightning.callbacks import LearningRateMonitor
+from pytorch_lightning.callbacks import ModelCheckpoint
+from objdetecteval.metrics.coco_metrics import get_coco_stats
 
 
 def unfreeze(model,percent=0.25):
@@ -49,3 +61,29 @@ def check_freeze(model):
         for l in layer.parameters():
             s.append(l.requires_grad)
         print(name ,all(s))
+        
+        
+def run_wbf(predictions, image_size=1024, iou_thr=0.44, skip_box_thr=0.43, weights=None):
+    bboxes = []
+    confidences = []
+    class_labels = []
+
+    for prediction in predictions:
+        boxes = [(prediction["boxes"] / image_size).tolist()]
+        scores = [prediction["scores"].tolist()]
+        labels = [prediction["classes"].tolist()]
+
+        boxes, scores, labels = ensemble_boxes_wbf.weighted_boxes_fusion(
+            boxes,
+            scores,
+            labels,
+            weights=weights,
+            iou_thr=iou_thr,
+            skip_box_thr=skip_box_thr,
+        )
+        boxes = boxes * (image_size - 1)
+        bboxes.append(boxes.tolist())
+        confidences.append(scores.tolist())
+        class_labels.append(labels.tolist())
+
+    return bboxes, confidences, class_labels
