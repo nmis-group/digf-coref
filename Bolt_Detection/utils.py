@@ -24,3 +24,28 @@ from collections import Counter
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
 from sklearn.model_selection import StratifiedKFold
+from pytorch_lightning.loggers import TensorBoardLogger
+from pytorch_lightning.callbacks import LearningRateMonitor
+from pytorch_lightning.callbacks import ModelCheckpoint
+import pytorch_lightning as pl
+from effdet.config.model_config import efficientdet_model_param_dict
+from effdet import get_efficientdet_config, EfficientDet, DetBenchTrain
+from effdet.efficientdet import HeadNet
+from effdet.config.model_config import efficientdet_model_param_dict
+import timm
+
+
+def unfreeze(model,percent=0.25):
+    l = int(np.ceil(len(model._modules.keys())* percent))
+    l = list(model._modules.keys())[-l:]
+    print(f"unfreezing these layer {l}",)
+    for name in l:
+        for params in model._modules[name].parameters():
+            params.requires_grad_(True)
+
+def check_freeze(model):
+    for name ,layer in model._modules.items():
+        s = []
+        for l in layer.parameters():
+            s.append(l.requires_grad)
+        print(name ,all(s))
