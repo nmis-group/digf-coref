@@ -9,7 +9,10 @@ from fastcore.dispatch import typedispatch
 
 class BoltDetector(pl.LightningModule):
     def __init__(self,
-                 epochs = 10,
+                 df,
+                 bs = 2,
+                 num_workers = 16,
+                 epochs = 50,
                  num_classes=1,
                  img_size=1024,
                  prediction_confidence_threshold=0.2,
@@ -18,7 +21,11 @@ class BoltDetector(pl.LightningModule):
                  inference_transforms=get_valid_transforms(target_img_size=1024),
                  model_architecture='tf_efficientnetv2_l'):
         super().__init__()
+        self.df = df
+        self.bs = bs
+        self.num_workers = num_workers
         self.img_size = img_size
+        self.epochs = epochs
         self.num_classes = num_classes
         self.model_architecture = model_architecture
         self.model = self.create_model()
@@ -27,19 +34,87 @@ class BoltDetector(pl.LightningModule):
         self.wbf_iou_threshold = wbf_iou_threshold
         self.inference_tfms = inference_transforms
         self.save_hyperparameters()
+        
+        self.train_transforms = get_train_transforms(target_img_size=1024)
+        self.valid_transforms = get_valid_transforms(target_img_size=1024)
+        self.inference_transforms = get_valid_transforms(target_img_size=1024)
+        
+        self.train_dataset = BoltDataset(self.df, self.train_transforms , 'train')
+        print(len(self.train_dataset))
+        self.valid_dataset = BoltDataset(self.df, self.valid_transforms , 'valid')
+        print(len(self.valid_dataset))
+        self.test_dataset = BoltDataset(self.df, self.valid_transforms , 'test')
+        print(len(self.test_dataset))
+        
+    @staticmethod
+    def collate_fn(batch):
+        images, targets, bolts = tuple(zip(*batch))
+        images = torch.stack(images)
+        images = images.float()
 
+        boxes = [target["bboxes"].float() for target in targets]
+        labels = [target["labels"].float() for target in targets]
+        img_size = torch.tensor([target["img_size"] for target in targets]).float()
+        img_scale = torch.tensor([target["img_scale"] for target in targets]).float()
 
-    @auto_move_data
+        annotations = {
+            "bbox": boxes,
+            "cls": labels,
+            "img_size": img_size,
+            "img_scale": img_scale,
+        }
+
+        return images, annotations, targets, bolts
+
+    def train_dataloader(self):
+        self.train_loader = torch.utils.data.DataLoader(
+                self.train_dataset,
+                batch_size=self.bs,
+                shuffle=True,
+                pin_memory=True,
+                drop_last=True,
+                num_workers = self.num_workers,
+                collate_fn = self.collate_fn)
+        return self.train_loader
+    
+    def val_dataloader(self):
+        self.valid_loader = torch.utils.data.DataLoader(
+                self.valid_dataset,
+                batch_size=self.bs,
+                shuffle=False,
+                pin_memory=True,
+                drop_last=True,
+                num_workers = self.num_workers,
+                collate_fn = self.collate_fn)
+        return self.valid_loader
+    
+    def test_dataloader(self):
+        self.test_loader = torch.utils.data.DataLoader(
+                self.test_dataset,
+                batch_size=self.bs,
+                shuffle=False,
+                pin_memory=True,
+                drop_last=True,
+                num_workers = self.num_workers,
+                collate_fn = self.collate_fn)
+        return self.test_loader
+
+    #@auto_move_data
     def forward(self, images, targets):
         return self.model(images, targets)
 
     def configure_optimizers(self):
-        return torch.optim.AdamW(self.model.parameters(), lr=self.lr)
+        optimizer =  torch.optim.AdamW(self.model.parameters(), lr=self.lr)
+#         #scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer,
+#                                                         max_lr=self.lr,
+#                                                         steps_per_epoch=len(self.train_dataloader()),
+#                                                         epochs=self.epochs)
+        return [optimizer]#, [scheduler]
     
     def create_model(self):
-        efficientdet_model_param_dict['tf_efficientnetv2_l'] = dict(
-            name='tf_efficientnetv2_l',
-            backbone_name='tf_efficientnetv2_l',
+        efficientdet_model_param_dict[self.model_architecture] = dict(
+            name=self.model_architecture,
+            backbone_name=self.model_architecture,
             backbone_args=dict(drop_path_rate=0.2),
             num_classes=self.num_classes,
             url='', )
@@ -51,10 +126,7 @@ class BoltDetector(pl.LightningModule):
         print(config)
 
         net = EfficientDet(config, pretrained_backbone=True)
-        net.class_net = HeadNet(
-            config,
-            num_outputs=config.num_classes,
-        )
+        net.class_net = HeadNet(config, num_outputs=config.num_classes,)
         check_freeze(net)
         return DetBenchTrain(net, config)
 
@@ -83,10 +155,12 @@ class BoltDetector(pl.LightningModule):
 
         detections = outputs["detections"]
 
+        (predicted_bboxes, predicted_class_confidences, predicted_class_labels,) = self.post_process_detections(detections)
+
         batch_predictions = {
             "predictions": detections,
             "targets": targets,
-            "bolts_counted": len(detections),
+            "bolts_counted": len(predicted_bboxes),
         }
 
         logging_losses = {
@@ -226,67 +300,67 @@ class BoltDetector(pl.LightningModule):
     
 
 
-@patch
-def aggregate_prediction_outputs(self: BoltDetector, outputs):
+#     @patch
+#     def aggregate_prediction_outputs(self: BoltDetector, outputs):
 
-    detections = torch.cat(
-        [output["batch_predictions"]["predictions"] for output in outputs]
-    )
+#         detections = torch.cat(
+#             [output["batch_predictions"]["predictions"] for output in outputs]
+#         )
 
-    image_ids = []
-    targets = []
-    for output in outputs:
-        batch_predictions = output["batch_predictions"]
-        #image_ids.extend(batch_predictions["image_ids"])
-        targets.extend(batch_predictions["targets"])
+#         image_ids = []
+#         targets = []
+#         for output in outputs:
+#             batch_predictions = output["batch_predictions"]
+#             #image_ids.extend(batch_predictions["image_ids"])
+#             targets.extend(batch_predictions["targets"])
 
-    (
-        predicted_bboxes,
-        predicted_class_confidences,
-        predicted_class_labels,
-    ) = self.post_process_detections(detections)
+#         (
+#             predicted_bboxes,
+#             predicted_class_confidences,
+#             predicted_class_labels,
+#         ) = self.post_process_detections(detections)
 
-    return (
-        predicted_class_labels,
-        #image_ids,
-        predicted_bboxes,
-        predicted_class_confidences,
-        targets,
-    )
+#         return (
+#             predicted_class_labels,
+#             #image_ids,
+#             predicted_bboxes,
+#             predicted_class_confidences,
+#             targets,
+#         )
 
 
-@patch
-def validation_epoch_end(self: BoltDetector, outputs):
-    """Compute and log training loss and accuracy at the epoch level."""
+#     @patch
+#     def validation_epoch_end(self: BoltDetector, outputs):
+#         """Compute and log training loss and accuracy at the epoch level."""
 
-    validation_loss_mean = torch.stack(
-        [output["loss"] for output in outputs]
-    ).mean()
+#         validation_loss_mean = torch.stack(
+#             [output["loss"] for output in outputs]
+#         ).mean()
 
-    (
-        predicted_class_labels,
-        #image_ids,
-        predicted_bboxes,
-        predicted_class_confidences,
-        targets,
-    ) = self.aggregate_prediction_outputs(outputs)
+#         (
+#             predicted_class_labels,
+#             #image_ids,
+#             predicted_bboxes,
+#             predicted_class_confidences,
+#             targets,
+#         ) = self.aggregate_prediction_outputs(outputs)
 
-    #truth_image_ids = [target["image_id"].detach().item() for target in targets]
-    truth_boxes = [
-        target["bboxes"].detach()[:, [1, 0, 3, 2]].tolist() for target in targets
-    ] # convert to xyxy for evaluation
-    truth_labels = [target["labels"].detach().tolist() for target in targets]
+#         #truth_image_ids = [target["image_id"].detach().item() for target in targets]
+#         truth_boxes = [
+#             target["bboxes"].detach()[:, [1, 0, 3, 2]].tolist() for target in targets
+#         ] # convert to xyxy for evaluation
+#         truth_labels = [target["labels"].detach().tolist() for target in targets]
 
-    stats = get_coco_stats(
-        #prediction_image_ids=image_ids,
-        prediction_image_ids=[1]*len(truth_boxes),
-        predicted_class_confidences=predicted_class_confidences,
-        predicted_bboxes=predicted_bboxes,
-        predicted_class_labels=predicted_class_labels,
-        #target_image_ids=truth_image_ids,
-        target_image_ids=[1]*len(truth_boxes),
-        target_bboxes=truth_boxes,
-        target_class_labels=truth_labels,
-    )['All']
+#         stats = get_coco_stats(
+#             #prediction_image_ids=image_ids,
+#             prediction_image_ids=[1]*len(truth_boxes),
+#             predicted_class_confidences=predicted_class_confidences,
+#             predicted_bboxes=predicted_bboxes,
+#             predicted_class_labels=predicted_class_labels,
+#             #target_image_ids=truth_image_ids,
+#             target_image_ids=[1]*len(truth_boxes),
+#             target_bboxes=truth_boxes,
+#             target_class_labels=truth_labels,
+#         )['All']
 
-    return {"val_loss": validation_loss_mean, "metrics": stats}
+#         return {"val_loss": validation_loss_mean, "metrics": stats}

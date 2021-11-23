@@ -103,10 +103,10 @@ class BoltDataModule(pl.LightningDataModule):
 
         return valid_loader
     
-    @staticmethod
+#    @staticmethod
 #     def collate_fn(batch):
 #         return tuple(zip(*batch))
-    
+    @staticmethod
     def collate_fn(batch):
         images, targets, bolts = tuple(zip(*batch))
         images = torch.stack(images)
