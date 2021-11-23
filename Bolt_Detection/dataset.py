@@ -19,7 +19,7 @@ class BoltDataset(Dataset):
             df = df[df['fold'].isin([0,1,2])]
             df = df.reset_index(drop=True)
         self.df = df
-        print(len(self.df))
+        #print(len(self.df))
         self.transform = transform
     
     def get_image_and_labels_by_idx(self, index):
@@ -41,27 +41,34 @@ class BoltDataset(Dataset):
 
         target = {}
         #print(bboxes)
-        labels = torch.ones(len(bboxes), dtype=torch.int64)
+        labels = torch.ones((len(bboxes),), dtype=torch.int64)
+        bboxes = np.array(bboxes)
         if self.transform is not None:
             sample = self.transform(**{
                     'image': img,
                     'bboxes': bboxes,
                     'labels': labels
                 })
-            transformed_image = sample['image']
-            target['bboxes'] = torch.stack(tuple(map(torch.tensor, zip(*sample['bboxes'])))).permute(1, 0)
-            target['labels'] = torch.stack(tuple(sample['labels']))
         
-        #print(target['bboxes'])
-        #print(target['labels'])
-        _, new_h, new_w = transformed_image.shape
-        #transformed_bboxes = np.array(transformed_bboxes)
-        #transformed_bboxes[:, [0, 1, 2, 3]] = transformed_bboxes[:, [1, 0, 3, 2]]  # convert to yxyx
+        sample["bboxes"] = np.array(sample["bboxes"])
+        image = sample["image"]
+        bboxes = sample["bboxes"]
+        labels = sample["labels"]
 
-        target["img_size"] = (new_h, new_w)
-        target["img_scale"] = torch.tensor([1.0])
+        _, new_h, new_w = image.shape
+        sample["bboxes"][:, [0, 1, 2, 3]] = sample["bboxes"][
+            :, [1, 0, 3, 2]
+        ]  # convert to yxyx
 
-        return transformed_image, target, bolts
+        target = {
+            "bboxes": torch.as_tensor(bboxes, dtype=torch.float32),
+            "labels": torch.as_tensor(labels),
+            "bolts": bolts,
+            "img_size": (new_h, new_w),
+            "img_scale": torch.tensor([1.0]),
+        }
+
+        return image, target, bolts
         
 
     def __len__(self) -> int:

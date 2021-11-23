@@ -104,24 +104,24 @@ class BoltDataModule(pl.LightningDataModule):
         return valid_loader
     
     @staticmethod
-    def collate_fn(batch):
-        return tuple(zip(*batch))
-    
 #     def collate_fn(batch):
-#         images, targets, bolts = tuple(zip(*batch))
-#         images = torch.stack(images)
-#         images = images.float()
+#         return tuple(zip(*batch))
+    
+    def collate_fn(batch):
+        images, targets, bolts = tuple(zip(*batch))
+        images = torch.stack(images)
+        images = images.float()
 
-#         boxes = [target["bboxes"].float() for target in targets]
-#         labels = [target["labels"].float() for target in targets]
-#         img_size = torch.tensor([target["img_size"] for target in targets]).float()
-#         img_scale = torch.tensor([target["img_scale"] for target in targets]).float()
+        boxes = [target["bboxes"].float() for target in targets]
+        labels = [target["labels"].float() for target in targets]
+        img_size = torch.tensor([target["img_size"] for target in targets]).float()
+        img_scale = torch.tensor([target["img_scale"] for target in targets]).float()
 
-#         annotations = {
-#             "bbox": boxes,
-#             "cls": labels,
-#             "img_size": img_size,
-#             "img_scale": img_scale,
-#         }
+        annotations = {
+            "bbox": boxes,
+            "cls": labels,
+            "img_size": img_size,
+            "img_scale": img_scale,
+        }
 
-#         return images, annotations, targets, bolts
+        return images, annotations, targets, bolts
