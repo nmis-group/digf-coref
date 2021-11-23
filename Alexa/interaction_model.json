@@ -1,0 +1,180 @@
+{
+    "interactionModel": {
+        "languageModel": {
+            "invocationName": "connected reconfigurable factory",
+            "intents": [
+                {
+                    "name": "AMAZON.CancelIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.HelpIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.StopIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.NavigateHomeIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.FallbackIntent",
+                    "samples": []
+                },
+                {
+                    "name": "buildProcessIntent",
+                    "slots": [
+                        {
+                            "name": "process",
+                            "type": "assembly",
+                            "samples": [
+                                "For {process}",
+                                "Process {process}",
+                                "{process}"
+                            ]
+                        },
+                        {
+                            "name": "step",
+                            "type": "AMAZON.NUMBER",
+                            "samples": [
+                                "{process} {step}",
+                                "Step {step}"
+                            ]
+                        }
+                    ],
+                    "samples": [
+                        "help me with assembly",
+                        "Help me with {step}",
+                        "Help me with {process} {step}",
+                        "Help me build {process}",
+                        "How do i build {process}"
+                    ]
+                }
+            ],
+            "types": [
+                {
+                    "name": "assembly",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "bitzbloc final assembly",
+                                "synonyms": [
+                                    "Final assembly"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "pi mount assembly ",
+                                "synonyms": [
+                                    "pi mount",
+                                    "Pi mount"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "gooseneck",
+                                "synonyms": [
+                                    "Gooseneck assembly"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "dialog": {
+            "intents": [
+                {
+                    "name": "buildProcessIntent",
+                    "confirmationRequired": false,
+                    "prompts": {},
+                    "slots": [
+                        {
+                            "name": "process",
+                            "type": "assembly",
+                            "confirmationRequired": true,
+                            "elicitationRequired": true,
+                            "prompts": {
+                                "confirmation": "Confirm.Slot.228808106290.1032539197221",
+                                "elicitation": "Elicit.Slot.228808106290.1032539197221"
+                            }
+                        },
+                        {
+                            "name": "step",
+                            "type": "AMAZON.NUMBER",
+                            "confirmationRequired": true,
+                            "elicitationRequired": true,
+                            "prompts": {
+                                "confirmation": "Confirm.Slot.228808106290.244853015575",
+                                "elicitation": "Elicit.Slot.228808106290.244853015575"
+                            },
+                            "validations": [
+                                {
+                                    "type": "isLessThan",
+                                    "prompt": "Slot.Validation.228808106290.244853015575.1581527810273",
+                                    "value": "20"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "delegationStrategy": "ALWAYS"
+        },
+        "prompts": [
+            {
+                "id": "Slot.Validation.228808106290.244853015575.1581527810273",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "Sorry, this process step is larger than defined work instruction"
+                    }
+                ]
+            },
+            {
+                "id": "Elicit.Slot.228808106290.244853015575",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "Happy to help, which step do you require support?"
+                    },
+                    {
+                        "type": "PlainText",
+                        "value": "Sure, which step would you like help with?"
+                    }
+                ]
+            },
+            {
+                "id": "Confirm.Slot.228808106290.244853015575",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "I heard {step} , is this correct?"
+                    }
+                ]
+            },
+            {
+                "id": "Elicit.Slot.228808106290.1032539197221",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "Which process would you like help with?"
+                    }
+                ]
+            },
+            {
+                "id": "Confirm.Slot.228808106290.1032539197221",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "I heard {process} , is this correct?"
+                    }
+                ]
+            }
+        ]
+    }
+}
