@@ -211,6 +211,29 @@ class BoltDetector(pl.LightningModule):
         image_sizes = [(self.img_size, self.img_size)] * num_images
 
         return self._run_inference(images_tensor, image_sizes)
+    
+    @typedispatch
+    def count_bolts(self, images_tensor: torch.Tensor, bolts):
+        """
+        For making predictions from tensors returned from the model's dataloader
+        Args:
+            images_tensor: the images tensor returned from the dataloader
+
+        Returns: a tuple of lists containing bboxes, predicted_class_labels, predicted_class_confidences
+
+        """
+        if images_tensor.ndim == 3:
+            images_tensor = images_tensor.unsqueeze(0)
+        if (images_tensor.shape[-1] != self.img_size or images_tensor.shape[-2] != self.img_size):
+            raise ValueError(f"Input tensors must be of shape (N, 3, {self.img_size}, {self.img_size})")
+
+        num_images = images_tensor.shape[0]
+        image_sizes = [(self.img_size, self.img_size)] * num_images
+
+        _, _, _, bolts_predicted = self._run_inference_count_bolts(images_tensor, image_sizes)
+        
+        print('Ground Truth Bolts = {}'.format(bolts))
+        print('Predicted Bolts Count = {}'.format(bolts_predicted))
 
     def _run_inference(self, images_tensor, image_sizes):
         dummy_targets = self._create_dummy_inference_targets(num_images=images_tensor.shape[0])
@@ -225,6 +248,20 @@ class BoltDetector(pl.LightningModule):
         scaled_bboxes = self.__rescale_bboxes(predicted_bboxes=predicted_bboxes, image_sizes=image_sizes)
 
         return scaled_bboxes, predicted_class_labels, predicted_class_confidences
+    
+    def _run_inference_count_bolts(self, images_tensor, image_sizes):
+        dummy_targets = self._create_dummy_inference_targets(num_images=images_tensor.shape[0])
+
+        detections = self.model(images_tensor.to(self.device), dummy_targets)["detections"]
+        (
+            predicted_bboxes,
+            predicted_class_confidences,
+            predicted_class_labels,
+        ) = self.post_process_detections(detections)
+
+        scaled_bboxes = self.__rescale_bboxes(predicted_bboxes=predicted_bboxes, image_sizes=image_sizes)
+
+        return scaled_bboxes, predicted_class_labels, predicted_class_confidences, len(predicted_class_confidences[0])
     
     def _create_dummy_inference_targets(self, num_images):
         dummy_targets = {
