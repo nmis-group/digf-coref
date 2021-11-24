@@ -185,16 +185,10 @@ class BoltDetector(pl.LightningModule):
 
         """
         image_sizes = [(image.size[1], image.size[0]) for image in images]
-        images_tensor = torch.stack(
-            [
-                self.inference_tfms(
-                    image=np.array(image, dtype=np.float32),
-                    labels=np.ones(1),
-                    bboxes=np.array([[0, 0, 1, 1]]),
-                )["image"]
-                for image in images
-            ]
-        )
+        images_tensor = torch.stack([ self.inference_tfms(
+                                      image=np.array(image, dtype=np.float32),
+                                      labels=np.ones(1),
+                                      bboxes=np.array([[0, 0, 1, 1]]),)["image"]  for image in images])
 
         return self._run_inference(images_tensor, image_sizes)
 
@@ -219,22 +213,16 @@ class BoltDetector(pl.LightningModule):
         return self._run_inference(images_tensor, image_sizes)
 
     def _run_inference(self, images_tensor, image_sizes):
-        dummy_targets = self._create_dummy_inference_targets(
-            num_images=images_tensor.shape[0]
-        )
+        dummy_targets = self._create_dummy_inference_targets(num_images=images_tensor.shape[0])
 
-        detections = self.model(images_tensor.to(self.device), dummy_targets)[
-            "detections"
-        ]
+        detections = self.model(images_tensor.to(self.device), dummy_targets)["detections"]
         (
             predicted_bboxes,
             predicted_class_confidences,
             predicted_class_labels,
         ) = self.post_process_detections(detections)
 
-        scaled_bboxes = self.__rescale_bboxes(
-            predicted_bboxes=predicted_bboxes, image_sizes=image_sizes
-        )
+        scaled_bboxes = self.__rescale_bboxes(predicted_bboxes=predicted_bboxes, image_sizes=image_sizes)
 
         return scaled_bboxes, predicted_class_labels, predicted_class_confidences
     
