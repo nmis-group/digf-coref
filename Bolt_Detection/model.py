@@ -285,70 +285,68 @@ class BoltDetector(pl.LightningModule):
 
         return scaled_bboxes
     
-    
+
+@patch
+def aggregate_prediction_outputs(self: BoltDetector, outputs):
+
+    detections = torch.cat(
+        [output["batch_predictions"]["predictions"] for output in outputs]
+    )
+
+    image_ids = []
+    targets = []
+    for output in outputs:
+        batch_predictions = output["batch_predictions"]
+        #image_ids.extend(batch_predictions["image_ids"])
+        targets.extend(batch_predictions["targets"])
+
+    (
+        predicted_bboxes,
+        predicted_class_confidences,
+        predicted_class_labels,
+    ) = self.post_process_detections(detections)
+
+    return (
+        predicted_class_labels,
+        #image_ids,
+        predicted_bboxes,
+        predicted_class_confidences,
+        targets,
+    )
 
 
-#     @patch
-#     def aggregate_prediction_outputs(self: BoltDetector, outputs):
+@patch
+def validation_epoch_end(self: BoltDetector, outputs):
+    """Compute and log training loss and accuracy at the epoch level."""
 
-#         detections = torch.cat(
-#             [output["batch_predictions"]["predictions"] for output in outputs]
-#         )
+    validation_loss_mean = torch.stack(
+        [output["loss"] for output in outputs]
+    ).mean()
 
-#         image_ids = []
-#         targets = []
-#         for output in outputs:
-#             batch_predictions = output["batch_predictions"]
-#             #image_ids.extend(batch_predictions["image_ids"])
-#             targets.extend(batch_predictions["targets"])
+    (
+        predicted_class_labels,
+        #image_ids,
+        predicted_bboxes,
+        predicted_class_confidences,
+        targets,
+    ) = self.aggregate_prediction_outputs(outputs)
 
-#         (
-#             predicted_bboxes,
-#             predicted_class_confidences,
-#             predicted_class_labels,
-#         ) = self.post_process_detections(detections)
+    #truth_image_ids = [target["image_id"].detach().item() for target in targets]
+    truth_boxes = [
+        target["bboxes"].detach()[:, [1, 0, 3, 2]].tolist() for target in targets
+    ] # convert to xyxy for evaluation
+    truth_labels = [target["labels"].detach().tolist() for target in targets]
 
-#         return (
-#             predicted_class_labels,
-#             #image_ids,
-#             predicted_bboxes,
-#             predicted_class_confidences,
-#             targets,
-#         )
+    stats = get_coco_stats(
+        #prediction_image_ids=image_ids,
+        prediction_image_ids=[1]*len(truth_boxes),
+        predicted_class_confidences=predicted_class_confidences,
+        predicted_bboxes=predicted_bboxes,
+        predicted_class_labels=predicted_class_labels,
+        #target_image_ids=truth_image_ids,
+        target_image_ids=[1]*len(truth_boxes),
+        target_bboxes=truth_boxes,
+        target_class_labels=truth_labels,
+    )['All']
 
-
-#     @patch
-#     def validation_epoch_end(self: BoltDetector, outputs):
-#         """Compute and log training loss and accuracy at the epoch level."""
-
-#         validation_loss_mean = torch.stack(
-#             [output["loss"] for output in outputs]
-#         ).mean()
-
-#         (
-#             predicted_class_labels,
-#             #image_ids,
-#             predicted_bboxes,
-#             predicted_class_confidences,
-#             targets,
-#         ) = self.aggregate_prediction_outputs(outputs)
-
-#         #truth_image_ids = [target["image_id"].detach().item() for target in targets]
-#         truth_boxes = [
-#             target["bboxes"].detach()[:, [1, 0, 3, 2]].tolist() for target in targets
-#         ] # convert to xyxy for evaluation
-#         truth_labels = [target["labels"].detach().tolist() for target in targets]
-
-#         stats = get_coco_stats(
-#             #prediction_image_ids=image_ids,
-#             prediction_image_ids=[1]*len(truth_boxes),
-#             predicted_class_confidences=predicted_class_confidences,
-#             predicted_bboxes=predicted_bboxes,
-#             predicted_class_labels=predicted_class_labels,
-#             #target_image_ids=truth_image_ids,
-#             target_image_ids=[1]*len(truth_boxes),
-#             target_bboxes=truth_boxes,
-#             target_class_labels=truth_labels,
-#         )['All']
-
-#         return {"val_loss": validation_loss_mean, "metrics": stats}
+    return {"val_loss": validation_loss_mean, "metrics": stats}
