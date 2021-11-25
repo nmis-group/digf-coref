@@ -49,6 +49,43 @@ from pytorch_lightning import Trainer
 import torchvision.transforms as transforms
 from matplotlib import patches
 from fastcore.basics import patch
+import copy
+
+
+def filelist(root, file_type):
+    """Returns a fully-qualified list of filenames under root directory"""
+    return [os.path.join(directory_path, f) for directory_path, directory_name, 
+            files in os.walk(root) for f in files if f.endswith(file_type)]
+
+def generate_df (anno_path, images_path):
+    annotations = filelist(anno_path, '.xml')
+    anno_list = []
+    for anno_path in annotations:
+        root = ET.parse(anno_path).getroot()
+        anno = {}
+        anno['filename'] = Path(str(images_path) + '/'+ root.find("./filename").text)
+        anno['width'] = root.find("./size/width").text
+        anno['height'] = root.find("./size/height").text
+        if root.find("./object/name")!= None:
+            anno['class'] = root.find("./object/name").text
+        else:
+            anno['class'] = np.NaN
+        
+        bboxes = []
+        for neighbor in root.iter('bndbox'):
+            if root.find("./object/bndbox/xmin") != None:
+                xmin = int(float(neighbor.find('xmin').text))
+                ymin = int(float(neighbor.find('ymin').text))
+                xmax = int(float(neighbor.find('xmax').text))
+                ymax = int(float(neighbor.find('ymax').text))
+
+                bboxes.append([xmin, ymin, xmax, ymax])
+                anno['bboxes'] = bboxes
+            else: 
+                anno['bboxes'] = np.NaN     
+       
+        anno_list.append(anno)
+    return pd.DataFrame(anno_list)
 
 
 def unfreeze(model,percent=0.25):

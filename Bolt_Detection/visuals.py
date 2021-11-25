@@ -1,5 +1,18 @@
 from utils import *
 
+def visualize_augmentations(dataset, idx=111, samples=6, cols=3):
+    dataset = copy.deepcopy(dataset)
+    #dataset.transform = A.Compose([t for t in dataset.transform if not isinstance(t, (A.Normalize, ToTensorV2))])
+    rows = samples // cols
+    figure, ax = plt.subplots(nrows=rows, ncols=cols, figsize=(20,10))
+    for i in range(samples):
+        image, _, _ = dataset[idx]
+        ax.ravel()[i].imshow(image)
+        ax.ravel()[i].set_axis_off()
+    plt.tight_layout()
+    #plt.savefig('./figures/' + filename + '.png', dpi = 500)
+    plt.show()    
+
 def show_prediction_two_plots(img, out, targets):
     img = img.cpu().permute(1,2,0).numpy()
     mean = np.array([0.485, 0.456, 0.406])
