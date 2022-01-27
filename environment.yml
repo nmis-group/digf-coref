@@ -18,6 +18,7 @@ dependencies:
   - albumentations
   - tensorboard
   - fastcore
+  - pyopengl
   - pip:
     - effdet
     - ensemble_boxes
