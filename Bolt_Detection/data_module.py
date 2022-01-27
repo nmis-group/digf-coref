@@ -1,7 +1,7 @@
 from utils import *
 from dataset import *
 
-def get_train_transforms(target_img_size=1024):
+def get_train_transforms(target_img_size=512):
     return A.Compose(
         [
             A.HorizontalFlip(p=0.5),
@@ -21,7 +21,7 @@ def get_train_transforms(target_img_size=1024):
     )
 
 
-def get_valid_transforms(target_img_size=1024):
+def get_valid_transforms(target_img_size=512):
     return A.Compose(
         [
             A.Resize(height=target_img_size, width=target_img_size, p=1),
@@ -39,8 +39,8 @@ class BoltDataModule(pl.LightningDataModule):
     
     def __init__(self,
                 df,
-                train_transforms=get_train_transforms(target_img_size=1024),
-                valid_transforms=get_valid_transforms(target_img_size=1024),
+                train_transforms=get_train_transforms(target_img_size=512),
+                valid_transforms=get_valid_transforms(target_img_size=512),
                 num_workers=16,
                 bs=2):
         

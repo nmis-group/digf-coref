@@ -14,11 +14,11 @@ class BoltDetector(pl.LightningModule):
                  num_workers = 16,
                  epochs = 50,
                  num_classes=1,
-                 img_size=1024,
+                 img_size=512,
                  prediction_confidence_threshold=0.2,
                  learning_rate=0.001,
                  wbf_iou_threshold=0.44,
-                 inference_transforms=get_valid_transforms(target_img_size=1024),
+                 inference_transforms=get_valid_transforms(target_img_size=512),
                  model_architecture='tf_efficientnetv2_l'):
         super().__init__()
         self.df = df
@@ -35,9 +35,9 @@ class BoltDetector(pl.LightningModule):
         self.inference_tfms = inference_transforms
         self.save_hyperparameters()
         
-        self.train_transforms = get_train_transforms(target_img_size=1024)
-        self.valid_transforms = get_valid_transforms(target_img_size=1024)
-        self.inference_transforms = get_valid_transforms(target_img_size=1024)
+        self.train_transforms = get_train_transforms(target_img_size=self.img_size)
+        self.valid_transforms = get_valid_transforms(target_img_size=self.img_size)
+        self.inference_transforms = get_valid_transforms(target_img_size=self.img_size)
         
         self.train_dataset = BoltDataset(self.df, self.train_transforms , 'train')
         print(len(self.train_dataset))

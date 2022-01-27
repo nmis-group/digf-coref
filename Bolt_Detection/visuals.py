@@ -161,9 +161,13 @@ def visualize_bbox_with_df(df, index):
     
     img = cv2.imread(df.filename[index])
     img = img.transpose(1,0,2)
-    #img = np.fliplr(img)
-    img = np.flipud(img)
-    print(img.shape)
+    if img.shape[1]==2016:
+        img = np.rot90(img,axes=(1, 0))
+        img = np.fliplr(img)
+    else:
+        img = np.flipud(img)
+    if img.shape[1] == 3024:
+        img = np.rot90(img,axes=(1, 0))
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     
     for b in bboxes:

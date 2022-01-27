@@ -21,24 +21,31 @@ class BoltDataset(Dataset):
         self.df = df
         #print(len(self.df))
         self.transform = transform
-    
+
     def get_image_and_labels_by_idx(self, index):
         path = self.df.filename[index]
-        #print(path)
+        # print(path)
         bolts = self.df.total_bolts[index]
-        img= cv2.imread(path)        
+        img = cv2.imread(self.df.filename[index])
         img = img.transpose(1,0,2)
-        img = np.flipud(img)
+        if img.shape[1]==2016:
+            img = np.rot90(img,axes=(1, 0))
+            img = np.fliplr(img)
+        else:
+            img = np.flipud(img)
+        if img.shape[1] == 3024:
+            img = np.rot90(img,axes=(1, 0))
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         bboxes = self.df.bboxes[index]
         #labels=['Bolt']*len(bboxes)
         #print(bboxes)
         return img, bboxes, bolts
+  
 
     def __getitem__(self, index: int):
         
         (img, bboxes, bolts) = self.get_image_and_labels_by_idx(index)
-
         target = {}
         #print(bboxes)
         labels = torch.ones((len(bboxes),), dtype=torch.int64)
