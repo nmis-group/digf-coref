@@ -21,10 +21,11 @@ Download and install the latest conda for ARM64 (https://repo.anaconda.com/archi
 
 [Conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html)
 
-command line:
+A. Step by step deploy the developement environment by command line:
 
 Implement the deep learning environment.
 
+Add channels to the conda
 'sh
 conda config --add channels https://repo.anaconda.com/pkgs/main
 
@@ -32,9 +33,19 @@ conda config --add channels https://conda.anaconda.org/anaconda
 
 conda config --add channels conda-forge
 
-conda create -n ai python==3.8.
+'
 
-python -m ipykernel install --user --name ai --display-name "AI"
+Create the environment
+'sh
+conda create -n deep python==3.8.
+
+python -m ipykernel install --user --name deep --display-name "DL"
+'
+
+Add the dependency package for deep learning IDE. Normally, the nessesory package for deep learning depends on the chosing library. Following list of package is an exmple.
+
+
+'sh
 
 conda install -c conda-forge pillow
 
@@ -59,12 +70,15 @@ conda install -c conda-forge pytorch-lighting
 conda install -c conda-forge tensorboard
 '
 
-Alternative way to implement the conda environment is to directly use the pre-defined environment yaml file with the correct deep learning and computer vision package such as pytorch, opencv, etc. 
+B. Alternative way to implement the conda environment is to directly use the pre-defined [environment yaml](/environment.yml) file with the correct deep learning and computer vision package such as pytorch, opencv, etc. 
 Get the environment.yml file from github repository,
 
 run the following command from terminal
 'sh
 conda create -n <environment name>
+  
+conda activiate <environment name>
+
 conda env update -f environment.yml    
 '
 
@@ -73,7 +87,10 @@ conda env update -f environment.yml
 
 https://www.stereolabs.com/docs/get-started-with-zed-box/
 
+*If you know the jetpack version, skip this step and install the ZED SDK by type command from bash.*
+
 Check nvidia Jetson version
+
 'sh
 apt-cache policy nvidia-jetpack
 '
@@ -104,6 +121,8 @@ chmod +x ZED_SDK_<PLATFORM>_<VERSION>.run
 ./ZED_SDK_<PLATFORM>_<VERSION>.run
 '
 
+### Hit:
+  When use the ZED camera at the first time, the internet connection should be ensured in case of the downloading some module of ZED.
 
 
 
