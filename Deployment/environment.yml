@@ -1,0 +1,28 @@
+name: deep
+channels:
+  - defaults
+dependencies:
+  - jupyter
+  - numpy
+  - pandas
+  - python=3.6
+  - pytorch
+  - torchvision
+  - opencv
+  - libopencv
+  - py-opencv
+  - pytorch-lightning
+  - pillow
+  - matplotlib
+  - scikit-learn
+  - albumentations
+  - tensorboard
+  - fastcore
+  - pyopengl
+  - pip:
+    - effdet
+    - ensemble_boxes
+    - git+https://github.com/alexhock/object-detection-metrics
+    - opencv-contrib-python
+                                                                       
+
