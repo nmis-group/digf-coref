@@ -49,6 +49,7 @@ Replace "\<environment name>" with your environemt name.
 Following the [instruction](https://forums.developer.nvidia.com/t/pytorch-for-jetson-version-1-10-now-available/72048) to install the PyTorch on Jetson.
 
 **Note: Please be aware the correct python version for proper PyTorch**
+
 **Note: numpy 1.19.5 will cause [Illegal instruction (core dumped)](https://forums.developer.nvidia.com/t/illegal-instruction-core-dumped/165488) error when import torch in python interactive cli**
 
 
