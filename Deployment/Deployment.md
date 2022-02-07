@@ -50,7 +50,7 @@ Following the [instruction](https://forums.developer.nvidia.com/t/pytorch-for-je
 
 **Note: Please be aware the correct python version for proper PyTorch**
 
-**Note: numpy 1.19.5 will cause [Illegal instruction (core dumped)](https://forums.developer.nvidia.com/t/illegal-instruction-core-dumped/165488) error when import torch in python interactive cli**
+**Note: Use numpy=1.19.4. numpy 1.19.5 will cause [Illegal instruction (core dumped)](https://forums.developer.nvidia.com/t/illegal-instruction-core-dumped/165488) error when import torch in python interactive cli.**
 
 
 ### Add deep learning libraries
