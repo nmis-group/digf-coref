@@ -44,7 +44,7 @@ python -m ipykernel install --user --name <env name> --display-name "DL"
 
 Replace "\<environment name>" with your environemt name.
 
-### PyTorch on Jetson platform
+### 2 PyTorch on Jetson platform
 
 Following the [instruction](https://forums.developer.nvidia.com/t/pytorch-for-jetson-version-1-10-now-available/72048) to install the PyTorch on Jetson.
 
@@ -53,9 +53,9 @@ Following the [instruction](https://forums.developer.nvidia.com/t/pytorch-for-je
 **Note: Use numpy=1.19.4. numpy 1.19.5 will cause [Illegal instruction (core dumped)](https://forums.developer.nvidia.com/t/illegal-instruction-core-dumped/165488) error when import torch in python interactive cli.**
 
 
-### Add deep learning libraries
+### 3 Add deep learning libraries
 
-Add the dependency package for deep learning IDE. Normally, the nessesory package for deep learning depends on the chosing library. 
+A. Add the dependency package for deep learning IDE. Normally, the nessesory package for deep learning depends on the chosing library. 
 
 Recommended libraries list:
 
@@ -63,16 +63,27 @@ Recommended libraries list:
 - pandas
 - opencv
 - libopencv
-- py-opency
+- py-opencv
 - matplotlib
 - scikit-learn
 - pytorch
-- pytorch-lighting
+- pytorch-lightning
 - trochvison
 - torchaudio
 - cudatoolkit
 - albumentations
 - tensorboard
+- fastcore
+- pyopengl
+
+pip installation:
+- effdet
+- ensemble_boxes
+- opencv-contrib-python
+- git+https://github.com/alexhock/object-detection-metrics
+
+***Note:***
+***Confliction will be found when install pytorch-lightning and ensemble_boxes while the python environment is 3.6 on the Jetson platform ***
 
 B. Alternative way to implement the conda environment is to directly use the pre-defined [environment yaml](../environment.yml) file with the correct deep learning and computer vision package such as pytorch, opencv, etc. 
 Get the environment.yml file from github repository,
@@ -87,7 +98,7 @@ conda env update -f environment.yml
 ```
 
 
-### 2 Deployment ZED SDK
+### 4 Deployment ZED SDK
 
 https://www.stereolabs.com/docs/get-started-with-zed-box/
 
@@ -127,7 +138,7 @@ chmod +x ZED_SDK_<PLATFORM>_<VERSION>.run
 
 
 
-### Hit:
+### 5 Hit:
   When use the ZED camera at the first time, the internet connection should be ensured in case of the downloading some module of ZED.
 
 
