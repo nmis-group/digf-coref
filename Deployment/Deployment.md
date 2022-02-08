@@ -82,8 +82,9 @@ pip installation:
 - opencv-contrib-python
 - git+https://github.com/alexhock/object-detection-metrics
 
-***Note:***
-***Confliction will be found when install pytorch-lightning and ensemble_boxes while the python environment is 3.6 on the Jetson platform ***
+**Note:**
+
+**Confliction will be found when install pytorch-lightning and ensemble_boxes while the python environment is 3.6 on the Jetson platform **
 
 B. Alternative way to implement the conda environment is to directly use the pre-defined [environment yaml](../environment.yml) file with the correct deep learning and computer vision package such as pytorch, opencv, etc. 
 Get the environment.yml file from github repository,
