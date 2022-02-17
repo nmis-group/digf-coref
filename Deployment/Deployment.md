@@ -52,6 +52,11 @@ Following the [instruction](https://forums.developer.nvidia.com/t/pytorch-for-je
 
 **Note: Use numpy=1.19.4. numpy 1.19.5 will cause [Illegal instruction (core dumped)](https://forums.developer.nvidia.com/t/illegal-instruction-core-dumped/165488) error when import torch in python interactive cli.**
 
+**Note: If the Illegal instruction (core dumped) still exist, the work around on the Jetson platform is add the following environment**
+```sh
+export OPENBLAS_CORETYPE=ARMV8
+```
+
 
 ### 3 Add deep learning libraries
 
@@ -84,7 +89,7 @@ pip installation:
 
 **Note:**
 
-**Confliction will be found when install pytorch-lightning and ensemble_boxes while the python environment is 3.6 on the Jetson platform **
+**Confliction will be found when install pytorch-lightning and ensemble_boxes while the python environment is 3.6 on the Jetson platform**
 
 B. Alternative way to implement the conda environment is to directly use the pre-defined [environment yaml](../environment.yml) file with the correct deep learning and computer vision package such as pytorch, opencv, etc. 
 Get the environment.yml file from github repository,
