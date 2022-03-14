@@ -1,7 +1,7 @@
 from utils import *
 from dataset import *
 
-def get_train_transforms(target_img_size=512):
+def get_train_transforms(target_img_size=1024):
     return A.Compose(
         [
             A.HorizontalFlip(p=0.5),
@@ -21,7 +21,7 @@ def get_train_transforms(target_img_size=512):
     )
 
 
-def get_valid_transforms(target_img_size=512):
+def get_valid_transforms(target_img_size=1024):
     return A.Compose(
         [
             A.Resize(height=target_img_size, width=target_img_size, p=1),

@@ -34,12 +34,12 @@ from effdet.efficientdet import HeadNet
 from effdet.config.model_config import efficientdet_model_param_dict
 import timm
 from pytorch_lightning import LightningDataModule
-from pytorch_lightning.core.decorators import auto_move_data
+#from pytorch_lightning.core.decorators import auto_move_data
 from numbers import Number
 from typing import List
 from functools import singledispatch
 from fastcore.dispatch import typedispatch
-from pytorch_lightning.core.decorators import auto_move_data
+#from pytorch_lightning.core.decorators import auto_move_data
 from ensemble_boxes import ensemble_boxes_wbf
 from pytorch_lightning.loggers import TensorBoardLogger
 from pytorch_lightning.callbacks import LearningRateMonitor

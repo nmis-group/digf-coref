@@ -1,7 +1,7 @@
 from utils import *
 from dataset import *
 from data_module import *
-from pytorch_lightning.core.decorators import auto_move_data
+#from pytorch_lightning.core.decorators import auto_move_data
 from numbers import Number
 from typing import List
 from functools import singledispatch
@@ -14,11 +14,11 @@ class BoltDetector(pl.LightningModule):
                  num_workers = 16,
                  epochs = 50,
                  num_classes=1,
-                 img_size=512,
+                 img_size=1024,
                  prediction_confidence_threshold=0.2,
                  learning_rate=0.001,
                  wbf_iou_threshold=0.44,
-                 inference_transforms=get_valid_transforms(target_img_size=512),
+                 inference_transforms=get_valid_transforms(target_img_size=1024),
                  model_architecture='tf_efficientnetv2_l'):
         super().__init__()
         self.df = df
