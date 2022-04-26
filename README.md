@@ -95,7 +95,6 @@ In this repository, a Computer Vision (CV) object detection system by using ZED 
 ### Built With
 
 This project build in anaconda environment with the python 3.6. Major frameworks/libraries are list below
-This section should list any major frameworks/libraries used to bootstrap your project. Leave any add-ons/plugins for the acknowledgements section.
 
 * [Anaconda](https://anaconda.org/)
 * [Jupyter](https://jupyter.org/)
@@ -117,9 +116,19 @@ This section should list any major frameworks/libraries used to bootstrap your p
 
 <!-- GETTING STARTED -->
 ## Getting Started
+To get start, first clone this repository with the command into your local.
+
+```sh
+git clone https://github.com/nmis-group/AFRC_CRAD_1718_COREF.git
+```
+Following the deployment to install nessesary development environment and dependency frameworks and libraries.
 
 * [Deployment](./Deployment/Deployment.MD)
+
+Then, in the Bolte_Detection folder, it will demostrates the CV pipeline from the image classification to model training.
+
 * [Bolt_Detection](./Bolt_Detection/Readme.MD)
+
 
 ### Prerequisites
 
@@ -132,32 +141,23 @@ This section should list any major frameworks/libraries used to bootstrap your p
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
-
 <!-- USAGE EXAMPLES -->
 ## Usage
-
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
 
 _For more examples, please refer to the [Documentation](https://example.com)_
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-
-
 <!-- ROADMAP -->
 ## Roadmap
 
-- [x] Add Changelog
-- [x] Add back to top links
-- [ ] Add Additional Templates w/ Examples
-- [ ] Add "components" document to easily copy & paste sections of the readme
+- [x] Make repository public
+- [ ] Add tutorial on windows platform
 
 
 See the [open issues](https://github.com/nmis-group/AFRC_CRAD_1718_COREF/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-
-
 
 <!-- CONTRIBUTING -->
 ## Contributing
@@ -176,7 +176,6 @@ Don't forget to give the project a star! Thanks again!
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
-
 <!-- LICENSE -->
 ## License
 
@@ -189,7 +188,7 @@ Distributed under the GNU GPL V3 License. See `LICENSE.txt` for more information
 <!-- CONTACT -->
 ## Contact
 
-NMIS DIGITAL TEAM - [@your_twitter](https://nmis.scot/) - email@example.com
+NMIS DIGITAL TEAM - [@National Manufacturing Institute Scotland](https://twitter.com/NMIS_group?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor) - anastasios.stamoulakatos@strath.ac.uk andrew.hamilton@strath.ac.uk syed.munawar@strath.ac.uk jianfeng.huang@strath.ac.uk
 
 Project Link: [https://github.com/nmis-group/AFRC_CRAD_1718_COREF](https://github.com/nmis-group/AFRC_CRAD_1718_COREF)
 
