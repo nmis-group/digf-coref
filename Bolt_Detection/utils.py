@@ -51,6 +51,17 @@ from matplotlib import patches
 from fastcore.basics import patch
 import copy
 
+# Root image directory for processing
+root_img = r'C:\Users\hwb20103\Github\AFRC_CRAD_1718_COREF\Training_Data\images'
+
+# Root annotation directory for model training
+root_annotation = r'C:\Users\hwb20103\Github\AFRC_CRAD_1718_COREF\Training_Data\exported-labels\img-all\Annotations'
+
+# Training output path
+save_path = r'C:\Users\hwb20103\Github\AFRC_CRAD_1718_COREF\detector'
+
+# path for ckpt file
+path = r'C:\Users\hwb20103\Github\AFRC_CRAD_1718_COREF\detector\detector-epoch=97-valid_loss=0.16.ckpt'
 
 def filelist(root, file_type):
     """Returns a fully-qualified list of filenames under root directory"""

@@ -27,7 +27,12 @@ class BoltDataset(Dataset):
         # print(path)
         bolts = self.df.total_bolts[index]
         img = cv2.imread(self.df.filename[index])
-        img = img.transpose(1,0,2)
+        
+        try:
+          img = img.transpose(1,0,2)
+        except:
+          print(self.df.filename[index])
+          
         if img.shape[1]==2016:
             img = np.rot90(img,axes=(1, 0))
             img = np.fliplr(img)
