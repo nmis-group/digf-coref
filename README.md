@@ -27,8 +27,8 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/ultralytics/yolov5">
-    <img src="images/logo.png" alt="Logo" width="280" height="180">
+  <a href="https://www.nmis.scot">
+    <img src="resources/images/logo.png" alt="Logo" width="280" height="180">
   </a>
 
   <h3 align="center">NMIS COREF</h3>
@@ -79,9 +79,9 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-Project Name: 7AFRC_CRAD_1718_COREF
+Project Name: Real-time Bolt Detection
 
-COREF project is a colab project with Thales UK. In this repository, we only demostrate the real-time bolt detection tutoruial by using deep learning.
+In this repository, we only demostrate the real-time bolt detection tutoruial by using deep learning.
 
 
 [![Product Name Screen Shot][product-screenshot]](https://www.nmis.scot/)
@@ -89,7 +89,6 @@ COREF project is a colab project with Thales UK. In this repository, we only dem
 In this repository, a Computer Vision (CV) object detection system by using ZED camera and edge device and with a deep learning model is presented. According to the CV system structure, data collection annotation, EfficientDet model training, YOLOv5 model training and real time detection are illustrated separately. Finally, by deploying and integrating the system on the smart workbench, it successfully detects all bolts on the working process of assembly. The result reveals that the CV system has a high accuracy of bolts object detection according to the edge device and YOLOv5 model with deep learning.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-
 
 
 ### Built With
@@ -136,7 +135,7 @@ Then, in the Bolte_Detection folder, it will demostrates the CV pipeline from th
 
 ### Installation
 
-* [Deployment](./Deployment/Deployment.MD)
+* [Deployment](./documentation/Deployment/Deployment.MD)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -220,4 +219,4 @@ Use this space to list resources you find helpful and would like to give credit 
 [issues-url]: https://github.com/nmis-group/AFRC_CRAD_1718_COREF/issues
 [license-shield]: https://img.shields.io/badge/License-GPLv3-blue.svg
 [license-url]: https://www.gnu.org/licenses/gpl-3.0
-[product-screenshot]: images/screenshot.png
+[product-screenshot]: resources/images/screenshot.png
