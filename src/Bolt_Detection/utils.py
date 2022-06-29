@@ -52,16 +52,16 @@ from fastcore.basics import patch
 import copy
 
 # Root image directory for processing
-root_img = os.getcwd()+r'\Training_Data\images'
+root_img = os.getcwd()+r'/Training_Data/images'
 
 # Root annotation directory for model training
-root_annotation = os.getcwd()+r'\Training_Data\exported-labels\img-all\Annotations'
+root_annotation = os.getcwd()+r'/Training_Data/exported-labels/img-all/Annotations'
 
 # Training output path
-save_path =os.getcwd()+ r'\detector'
+save_path =os.getcwd()+ r'/detector'
 
 # path for ckpt file
-path = os.getcwd()+r'\detector\detector-epoch=97-valid_loss=0.16.ckpt'
+path = os.getcwd()+r'/detector/detector-epoch=97-valid_loss=0.16.ckpt'
 
 def filelist(root, file_type):
     """Returns a fully-qualified list of filenames under root directory"""
