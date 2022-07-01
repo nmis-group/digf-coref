@@ -28,7 +28,7 @@
 <br />
 <div align="center">
   <a href="https://www.nmis.scot">
-    <img src="resources/images/logo.png" alt="Logo" width="280" height="180">
+    <img src="resources/images/logo.png" alt="Logo" width="280" height="280">
   </a>
 
   <h3 align="center">NMIS COREF</h3>
