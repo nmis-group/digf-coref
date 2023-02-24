@@ -189,8 +189,6 @@ Distributed under the GNU GPL V3 License. See `LICENSE.txt` for more information
 
 NMIS DIGITAL TEAM - [@National Manufacturing Institute Scotland](https://twitter.com/NMIS_group?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor) - anastasios.stamoulakatos@strath.ac.uk andrew.hamilton@strath.ac.uk syed.munawar@strath.ac.uk jianfeng.huang@strath.ac.uk
 
-Project Link: [https://github.com/nmis-group/AFRC_CRAD_1718_COREF](https://github.com/nmis-group/AFRC_CRAD_1718_COREF)
-
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
